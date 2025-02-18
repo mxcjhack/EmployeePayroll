@@ -4,15 +4,15 @@ import com.epam.campus.dao.CollectionDataStore;
 import com.epam.campus.dao.DataStore;
 import com.epam.campus.model.Department;
 import com.epam.campus.model.Employee;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
-public class DefaultEmployeePayrollSystem implements EmployeePayrollSystem{
+@Service
+public class DefaultEmployeeService implements EmployeeService {
     Logger logger = Logger.getLogger(getClass().getName());
     DataStore dataStore = new CollectionDataStore();
 

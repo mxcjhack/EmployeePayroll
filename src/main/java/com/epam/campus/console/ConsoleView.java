@@ -3,23 +3,30 @@ package com.epam.campus.console;
 import com.epam.campus.model.Department;
 import com.epam.campus.model.Designation;
 import com.epam.campus.model.Employee;
-import com.epam.campus.service.DefaultEmployeePayrollSystem;
+import com.epam.campus.service.DefaultEmployeeService;
 import com.epam.campus.service.DepartmentFactory;
 import com.epam.campus.service.DesignationFactory;
-import com.epam.campus.service.EmployeePayrollSystem;
+import com.epam.campus.service.EmployeeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 
 import java.util.Scanner;
 
-/*
-Get all printing statements in View layer
- */
 
-public class View {
+@Component
+public class ConsoleView {
     private final Scanner scanner = new Scanner(System.in);
-    private final EmployeePayrollSystem employeePayrollSystem = new DefaultEmployeePayrollSystem();
+    private final EmployeeService employeeService;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    @Autowired
+    public ConsoleView(@Qualifier("defaultEmployeeService") EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
 
     public void start() {
         System.out.println("Hello User");
@@ -95,11 +102,11 @@ public class View {
         Department department = DepartmentFactory.createDepartment(departmentID);
 
         Employee employee = new Employee(id, name, age, dateOfJoining, gender, department, designation);
-        System.out.println(employeePayrollSystem.addEmployee(employee));
+        System.out.println(employeeService.addEmployee(employee));
     }
 
     private void readEmployees(){
-        System.out.println(employeePayrollSystem.readEmployees());
+        System.out.println(employeeService.readEmployees());
     }
 
     private void updateEmployee() {
@@ -123,13 +130,13 @@ public class View {
         System.out.print("Enter new value: ");
         String newValue = scanner.nextLine();
 
-        System.out.println(employeePayrollSystem.updateEmployee(idForUpdate, fieldToUpdate, newValue));
+        System.out.println(employeeService.updateEmployee(idForUpdate, fieldToUpdate, newValue));
     }
 
     private void deleteEmployee() {
         System.out.println("Enter Employee ID to delete: ");
         int idForDelete = scanner.nextInt();
-        System.out.println(employeePayrollSystem.deleteEmployee(idForDelete));
+        System.out.println(employeeService.deleteEmployee(idForDelete));
     }
 
     private void payrollByDepartment() {
@@ -143,17 +150,17 @@ public class View {
         System.out.println("6. Account And Finance");
         System.out.print("Select Department (Enter number 1-6): ");
         int departmentID = scanner.nextInt();
-        System.out.println(employeePayrollSystem.payrollByDepartment(DepartmentFactory.createDepartment(departmentID)));
+        System.out.println(employeeService.payrollByDepartment(DepartmentFactory.createDepartment(departmentID)));
     }
 
     private void payrollByID() {
         System.out.print("Enter Employee ID for payroll details: ");
         int idForPayroll = scanner.nextInt();
-        System.out.println(employeePayrollSystem.payrollByID(idForPayroll));
+        System.out.println(employeeService.payrollByID(idForPayroll));
     }
 
     private void defaultEmployees(){
-        System.out.println(employeePayrollSystem.defaultEmployees());
+        System.out.println(employeeService.defaultEmployees());
     }
 
     private void exitApplication() {
