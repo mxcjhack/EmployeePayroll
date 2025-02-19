@@ -1,20 +1,25 @@
 package com.epam.campus.service;
 
-import com.epam.campus.dao.CollectionDataStore;
 import com.epam.campus.dao.DataStore;
 import com.epam.campus.model.Department;
 import com.epam.campus.model.Employee;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.logging.Logger;
 
 @Service
 public class DefaultEmployeeService implements EmployeeService {
-    Logger logger = Logger.getLogger(getClass().getName());
-    DataStore dataStore = new CollectionDataStore();
+    private final DataStore dataStore;
+    private final SalaryCalculator salaryCalculator;
+
+    @Autowired
+    public DefaultEmployeeService(DataStore dataStore, SalaryCalculator salaryCalculator){
+        this.dataStore = dataStore;
+        this.salaryCalculator = salaryCalculator;
+    }
 
     @Override
     public String addEmployee(Employee employee) {
@@ -26,7 +31,7 @@ public class DefaultEmployeeService implements EmployeeService {
     @Override
     public String readEmployees() {
         List<Employee> employees = dataStore.giveEmployees();
-        StringBuilder result = new StringBuilder(new String());
+        StringBuilder result = new StringBuilder();
         for(Employee employee : employees){
             result.append(employee.toString()).append("\n");
         }
@@ -67,27 +72,25 @@ public class DefaultEmployeeService implements EmployeeService {
         if (department == null) throw new IllegalArgumentException("No such department");
 
         List<Employee> employees = dataStore.giveEmployees();
-        SalaryCalculator salaryCalculator = new DefaultSalaryCalculator();
         StringBuilder result = new StringBuilder();
 
         employees.stream()
                 .filter(employee -> department.equals(employee.getDepartment()))
                 .forEach(employee -> {
                     double grossSalary = salaryCalculator.calculateSalary(employee);
-                    result.append(employee.toString())
+                    result.append(employee)
                             .append(", Gross salary: ")
                             .append(grossSalary)
                             .append("\n");
                 });
 
-        return result.toString();
+        return String.valueOf(result);
     }
 
     @Override
     public String payrollByID(int id) {
         if(id < 0) throw new IllegalArgumentException();
         Employee employee = dataStore.getEmployeeById(id);
-        SalaryCalculator salaryCalculator = new DefaultSalaryCalculator();
         double grossSalary = salaryCalculator.calculateSalary(employee);
         return (employee.toString() + " Gross salary : " + grossSalary);
 
