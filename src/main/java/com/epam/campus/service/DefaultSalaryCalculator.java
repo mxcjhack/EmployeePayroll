@@ -1,7 +1,9 @@
 package com.epam.campus.service;
 
 import com.epam.campus.model.Employee;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DefaultSalaryCalculator implements SalaryCalculator{
 
     @Override

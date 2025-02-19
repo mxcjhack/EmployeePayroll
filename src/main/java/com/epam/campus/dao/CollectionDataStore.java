@@ -2,6 +2,7 @@ package com.epam.campus.dao;
 
 import com.epam.campus.model.*;
 import com.epam.campus.service.DesignationFactory;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+@Component
 public class CollectionDataStore implements DataStore{
     private final List<Employee> employees = new ArrayList<>();
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
