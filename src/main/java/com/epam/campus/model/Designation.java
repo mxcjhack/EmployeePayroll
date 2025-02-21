@@ -1,25 +1,45 @@
 package com.epam.campus.model;
 
+import jakarta.persistence.*;
 import java.util.Objects;
 
+@Entity
 public class Designation {
-	private String designationName;
-	private double baseSalary;
-	private double bonusPercentage;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-    public Designation(String designationName, double baseSalary, double bonusPercentage) {
-        setDesignationName(designationName);
-		setBaseSalary(baseSalary);
-		setBonusPercentage(bonusPercentage);
+    private String name;
+    private double baseSalary;
+    private double bonusPercentage;
+
+    // Default constructor (required by JPA)
+    public Designation() {
     }
 
-    public String getDesignationName() {
-        return designationName;
+    // Parameterized constructor
+    public Designation(String name, double baseSalary, double bonusPercentage) {
+        this.name = name;
+        this.baseSalary = baseSalary;
+        this.bonusPercentage = bonusPercentage;
     }
 
-    public void setDesignationName(String designationName) {
-        if(designationName == null || designationName.isEmpty()) throw new IllegalArgumentException("Designation name cannot be empty or null");
-		this.designationName = designationName;
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        if (name == null || name.isEmpty()) throw new IllegalArgumentException("Designation name cannot be null or empty");
+        this.name = name;
     }
 
     public double getBaseSalary() {
@@ -27,8 +47,8 @@ public class Designation {
     }
 
     public void setBaseSalary(double baseSalary) {
-        if(baseSalary <= 0) throw new IllegalArgumentException("Salary cannot be 0 or less");
-		this.baseSalary = baseSalary;
+        if (baseSalary <= 0) throw new IllegalArgumentException("Base salary cannot be 0 or less");
+        this.baseSalary = baseSalary;
     }
 
     public double getBonusPercentage() {
@@ -36,24 +56,28 @@ public class Designation {
     }
 
     public void setBonusPercentage(double bonusPercentage) {
-        if(bonusPercentage <= 0)throw new IllegalArgumentException("Bonus percentage cannot be 0 or less");
-		this.bonusPercentage = bonusPercentage;
+        if (bonusPercentage <= 0) throw new IllegalArgumentException("Bonus percentage cannot be 0 or less");
+        this.bonusPercentage = bonusPercentage;
     }
 
+    // equals(), hashCode(), and toString()
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Designation that = (Designation) o;
-        return Objects.equals(designationName, that.designationName);
+        return Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(designationName);
+        return Objects.hash(name);
     }
 
     @Override
     public String toString() {
-        return designationName;
+        return "Designation{" +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

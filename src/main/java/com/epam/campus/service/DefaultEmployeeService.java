@@ -1,79 +1,64 @@
 package com.epam.campus.service;
 
-import com.epam.campus.dao.DataStore;
 import com.epam.campus.model.Department;
+import com.epam.campus.model.Designation;
 import com.epam.campus.model.Employee;
+import com.epam.campus.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
 public class DefaultEmployeeService implements EmployeeService {
-    private final DataStore dataStore;
-    private final SalaryCalculator salaryCalculator;
+
+    private EmployeeRepository employeeRepository;
+    private SalaryCalculator salaryCalculator;
 
     @Autowired
-    public DefaultEmployeeService(DataStore dataStore, SalaryCalculator salaryCalculator){
-        this.dataStore = dataStore;
+    public DefaultEmployeeService(EmployeeRepository employeeRepository, SalaryCalculator salaryCalculator) {
+        this.employeeRepository = employeeRepository;
         this.salaryCalculator = salaryCalculator;
     }
 
     @Override
     public String addEmployee(Employee employee) {
-        if(employee == null) throw new IllegalArgumentException();
-        dataStore.addEmployee(employee);
+        employeeRepository.save(employee);
         return "Employee Added";
     }
 
     @Override
-    public String readEmployees() {
-        List<Employee> employees = dataStore.giveEmployees();
-        StringBuilder result = new StringBuilder();
-        for(Employee employee : employees){
-            result.append(employee.toString()).append("\n");
-        }
-
-        return result.toString();
+    public List<Employee> readEmployees() {
+        return employeeRepository.findAll();
     }
 
     @Override
     public String updateEmployee(int id, int fieldToUpdate, String newValue) {
-        if (id < 0 || fieldToUpdate < 0 || newValue == null || newValue.isEmpty()) throw new IllegalArgumentException();
-        Employee employee = dataStore.getEmployeeById(id);
-
+        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Employee not found"));
         switch (fieldToUpdate) {
             case 1 -> employee.setName(newValue);
             case 2 -> employee.setAge(Integer.parseInt(newValue));
-            case 3 -> employee.setDateOfJoining(LocalDate.parse(newValue, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            case 3 -> employee.setDateOfJoining(LocalDate.parse(newValue));
             case 4 -> employee.setGender(newValue);
             case 5 -> employee.setDepartment(new Department(newValue));
-            case 6 -> employee.setDesignation(DesignationFactory.createDesignationByName(newValue));
-            default -> {
-                return "Invalid Option";
-            }
+            case 6 -> employee.setDesignation(new Designation(newValue, 0, 0));
+            default -> throw new IllegalArgumentException("Invalid field to update");
         }
-
-        return ("field updated");
+        employeeRepository.save(employee);
+        return "Employee Updated";
     }
 
     @Override
     public String deleteEmployee(int id) {
-        if (id < 0) throw new IllegalArgumentException();
-        dataStore.deleteEmployee(id);
-        return ("Employee deleted");
+        employeeRepository.deleteById(id);
+        return "Employee Deleted";
     }
-
 
     @Override
     public String payrollByDepartment(Department department) {
-        if (department == null) throw new IllegalArgumentException("No such department");
-
-        List<Employee> employees = dataStore.giveEmployees();
+        List<Employee> employees = employeeRepository.findByDepartment(department);
         StringBuilder result = new StringBuilder();
-
         employees.stream()
                 .filter(employee -> department.equals(employee.getDepartment()))
                 .forEach(employee -> {
@@ -84,21 +69,14 @@ public class DefaultEmployeeService implements EmployeeService {
                             .append("\n");
                 });
 
-        return String.valueOf(result);
+        return result.toString();
     }
 
     @Override
     public String payrollByID(int id) {
-        if(id < 0) throw new IllegalArgumentException();
-        Employee employee = dataStore.getEmployeeById(id);
+        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Employee not found"));
         double grossSalary = salaryCalculator.calculateSalary(employee);
         return (employee.toString() + " Gross salary : " + grossSalary);
-
     }
 
-    @Override
-    public String defaultEmployees() {
-        dataStore.generateDefaultEmployees();
-        return ("Default employees generated");
-    }
 }

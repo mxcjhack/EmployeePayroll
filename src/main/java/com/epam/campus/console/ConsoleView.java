@@ -3,22 +3,29 @@ package com.epam.campus.console;
 import com.epam.campus.model.Department;
 import com.epam.campus.model.Designation;
 import com.epam.campus.model.Employee;
-import com.epam.campus.service.DepartmentFactory;
-import com.epam.campus.service.DesignationFactory;
+import com.epam.campus.repository.DepartmentRepository;
+import com.epam.campus.repository.DesignationRepository;
 import com.epam.campus.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class ConsoleView {
     private final EmployeeService employeeService;
     private final ConsoleService consoleService;
+    private final DepartmentRepository departmentRepository;
+    private final DesignationRepository designationRepository;
 
     @Autowired
-    public ConsoleView(EmployeeService employeeService, ConsoleService consoleService) {
+    public ConsoleView(EmployeeService employeeService, ConsoleService consoleService,
+                       DepartmentRepository departmentRepository, DesignationRepository designationRepository) {
         this.employeeService = employeeService;
         this.consoleService = consoleService;
+        this.departmentRepository = departmentRepository;
+        this.designationRepository = designationRepository;
     }
 
     public void start() {
@@ -35,8 +42,7 @@ public class ConsoleView {
                 4. Delete an Employee
                 5. Get Payroll Report by Department
                 6. Get Payroll Report of an Employee
-                7. Get Default Employees
-                8. Exit
+                7. Exit
             """);
 
             try {
@@ -48,10 +54,9 @@ public class ConsoleView {
                     case 4 -> deleteEmployee();
                     case 5 -> payrollByDepartment();
                     case 6 -> payrollByID();
-                    case 7 -> defaultEmployees();
-                    case 8 -> {
+                    case 7 -> {
                         System.out.println("Exiting application. Goodbye!");
-                        running = false;  // Exit the loop
+                        running = false;
                     }
                     default -> System.out.println("Invalid Choice");
                 }
@@ -63,37 +68,47 @@ public class ConsoleView {
 
     private void addEmployee() {
         System.out.println("Enter Employee Details:");
-        int id = consoleService.readInt("ID: ");
         String name = consoleService.readString("Name: ");
         int age = consoleService.readInt("Age: ");
         LocalDate dateOfJoining = consoleService.readDate("Enter Date of Joining (yyyy-MM-dd): ", "yyyy-MM-dd");
         String gender = consoleService.readString("Gender (M/F/O): ");
 
-        System.out.println("Designations are:");
-        System.out.println("1. Junior");
-        System.out.println("2. Senior");
-        System.out.println("3. Lead");
-        System.out.println("4. Head");
-        int designationID = consoleService.readInt("Select Designation (Enter number): ");
-
         System.out.println("Departments are:");
-        System.out.println("1. HR");
-        System.out.println("2. Sales And Marketing");
-        System.out.println("3. Infrastructure");
-        System.out.println("4. Product Development");
-        System.out.println("5. Security And Transport");
-        System.out.println("6. Account And Finance");
-        int departmentID = consoleService.readInt("Select Department (Enter number): ");
+        List<Department> departments = departmentRepository.findAll();
+        departments.forEach(d -> System.out.println(d.getId() + ". " + d.getName()));
 
-        Designation designation = DesignationFactory.createDesignationByID(designationID);
-        Department department = DepartmentFactory.createDepartment(departmentID);
+        int departmentId;
+        Department department;
+        while (true) {
+            departmentId = consoleService.readInt("Select Department (Enter number): ");
+            department = departmentRepository.findById(departmentId).orElse(null);
+            if (department != null) {
+                break;
+            }
+            System.out.println("Invalid Department ID. Please try again.");
+        }
 
-        Employee employee = new Employee(id, name, age, dateOfJoining, gender, department, designation);
+        System.out.println("Designations are:");
+        List<Designation> designations = designationRepository.findAll();
+        designations.forEach(d -> System.out.println(d.getId() + ". " + d.getName()));
+
+        int designationId;
+        Designation designation;
+        while (true) {
+            designationId = consoleService.readInt("Select Designation (Enter number): ");
+            designation = designationRepository.findById(designationId).orElse(null);
+            if (designation != null) {
+                break;
+            }
+            System.out.println("Invalid Designation ID. Please try again.");
+        }
+
+        Employee employee = new Employee(name, age, dateOfJoining, gender, department, designation);
         System.out.println(employeeService.addEmployee(employee));
     }
 
     private void readEmployees() {
-        System.out.println(employeeService.readEmployees());
+        employeeService.readEmployees().forEach(System.out::println);
     }
 
     private void updateEmployee() {
@@ -120,14 +135,11 @@ public class ConsoleView {
 
     private void payrollByDepartment() {
         System.out.println("Departments are:");
-        System.out.println("1. HR");
-        System.out.println("2. Sales And Marketing");
-        System.out.println("3. Infrastructure");
-        System.out.println("4. Product Development");
-        System.out.println("5. Security And Transport");
-        System.out.println("6. Account And Finance");
-        int departmentID = consoleService.readInt("Select Department (Enter number): ");
-        Department department = DepartmentFactory.createDepartment(departmentID);
+        departmentRepository.findAll().forEach(d -> System.out.println(d.getId() + ". " + d.getName()));
+        int departmentId = consoleService.readInt("Select Department (Enter number): ");
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Department ID"));
+
         System.out.println(employeeService.payrollByDepartment(department));
     }
 
@@ -136,13 +148,4 @@ public class ConsoleView {
         System.out.println(employeeService.payrollByID(idForPayroll));
     }
 
-    private void defaultEmployees() {
-        System.out.println(employeeService.defaultEmployees());
-    }
-
-    private void exitApplication() {
-        System.out.println("Exiting...");
-        consoleService.close();
-        System.exit(0);
-    }
 }
