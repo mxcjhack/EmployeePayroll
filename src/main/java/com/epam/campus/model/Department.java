@@ -1,37 +1,73 @@
 package com.epam.campus.model;
 
+import jakarta.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
+@Entity
 public class Department {
-	private String departmentName;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-    public Department(String departmentName) {
-		setDepartmentName(departmentName);
+    private String name;
+
+    @OneToMany(mappedBy = "department")
+    private List<Employee> employees;
+
+    // Default constructor (required by JPA)
+    public Department() {
     }
 
-    public String getDepartmentName() {
-        return departmentName;
+    // Parameterized constructor
+    public Department(String name) {
+        this.name = name;
     }
 
-    public void setDepartmentName(String departmentName) {
-        if(departmentName == null || departmentName.isEmpty()) throw new IllegalArgumentException("Department Name Should not be null or Empty");
-		this.departmentName = departmentName;
+    // Getters and Setters
+    public int getId() {
+        return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        if (name == null || name.isEmpty()) throw new IllegalArgumentException("Department name cannot be null or empty");
+        this.name = name;
+    }
+
+    public List<Employee> getEmployees() {
+        return employees;
+    }
+
+    public void setEmployees(List<Employee> employees) {
+        this.employees = employees;
+    }
+
+    // equals(), hashCode(), and toString()
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Department that = (Department) o;
-        return Objects.equals(departmentName, that.departmentName);
+        return Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(departmentName);
+        return Objects.hash(name);
     }
 
     @Override
     public String toString() {
-        return departmentName;
+        return "Department{" +
+                ", name='" + name + '\'' +
+                '}';
     }
 }
