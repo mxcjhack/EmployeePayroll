@@ -1,6 +1,7 @@
 package com.epam.campus.service;
 
 import com.epam.campus.model.Department;
+import com.epam.campus.model.Designation;
 import com.epam.campus.model.Employee;
 import java.util.List;
 
@@ -11,4 +12,6 @@ public interface EmployeeService {
     String deleteEmployee(int id);
     String payrollByDepartment(Department department);
     String payrollByID(int id);
+    List<Department> getAllDepartments();
+    List<Designation> getAllDesignations();
 }

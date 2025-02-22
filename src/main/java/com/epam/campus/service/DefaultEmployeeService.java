@@ -3,6 +3,8 @@ package com.epam.campus.service;
 import com.epam.campus.model.Department;
 import com.epam.campus.model.Designation;
 import com.epam.campus.model.Employee;
+import com.epam.campus.repository.DepartmentRepository;
+import com.epam.campus.repository.DesignationRepository;
 import com.epam.campus.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,11 +17,15 @@ public class DefaultEmployeeService implements EmployeeService {
 
     private EmployeeRepository employeeRepository;
     private SalaryCalculator salaryCalculator;
+    private DepartmentRepository departmentRepository;
+    private DesignationRepository designationRepository;
 
     @Autowired
-    public DefaultEmployeeService(EmployeeRepository employeeRepository, SalaryCalculator salaryCalculator) {
+    public DefaultEmployeeService(EmployeeRepository employeeRepository, SalaryCalculator salaryCalculator, DesignationRepository designationRepository, DepartmentRepository departmentRepository) {
         this.employeeRepository = employeeRepository;
         this.salaryCalculator = salaryCalculator;
+        this.departmentRepository = departmentRepository;
+        this.designationRepository = designationRepository;
     }
 
     @Override
@@ -77,6 +83,16 @@ public class DefaultEmployeeService implements EmployeeService {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Employee not found"));
         double grossSalary = salaryCalculator.calculateSalary(employee);
         return (employee.toString() + " Gross salary : " + grossSalary);
+    }
+
+    @Override
+    public List<Department> getAllDepartments() {
+        return departmentRepository.findAll();
+    }
+
+    @Override
+    public List<Designation> getAllDesignations() {
+        return designationRepository.findAll();
     }
 
 }
