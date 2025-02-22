@@ -3,8 +3,6 @@ package com.epam.campus.console;
 import com.epam.campus.model.Department;
 import com.epam.campus.model.Designation;
 import com.epam.campus.model.Employee;
-import com.epam.campus.repository.DepartmentRepository;
-import com.epam.campus.repository.DesignationRepository;
 import com.epam.campus.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,16 +14,11 @@ import java.util.List;
 public class ConsoleView {
     private final EmployeeService employeeService;
     private final ConsoleService consoleService;
-    private final DepartmentRepository departmentRepository;
-    private final DesignationRepository designationRepository;
 
     @Autowired
-    public ConsoleView(EmployeeService employeeService, ConsoleService consoleService,
-                       DepartmentRepository departmentRepository, DesignationRepository designationRepository) {
+    public ConsoleView(EmployeeService employeeService, ConsoleService consoleService) {
         this.employeeService = employeeService;
         this.consoleService = consoleService;
-        this.departmentRepository = departmentRepository;
-        this.designationRepository = designationRepository;
     }
 
     public void start() {
@@ -74,14 +67,18 @@ public class ConsoleView {
         String gender = consoleService.readString("Gender (M/F/O): ");
 
         System.out.println("Departments are:");
-        List<Department> departments = departmentRepository.findAll();
+        List<Department> departments = employeeService.getAllDepartments();
         departments.forEach(d -> System.out.println(d.getId() + ". " + d.getName()));
 
         int departmentId;
         Department department;
         while (true) {
             departmentId = consoleService.readInt("Select Department (Enter number): ");
-            department = departmentRepository.findById(departmentId).orElse(null);
+            int finalDepartmentId = departmentId;
+            department = departments.stream()
+                    .filter(d -> d.getId() == finalDepartmentId)
+                    .findFirst()
+                    .orElse(null);
             if (department != null) {
                 break;
             }
@@ -89,14 +86,18 @@ public class ConsoleView {
         }
 
         System.out.println("Designations are:");
-        List<Designation> designations = designationRepository.findAll();
+        List<Designation> designations = employeeService.getAllDesignations();
         designations.forEach(d -> System.out.println(d.getId() + ". " + d.getName()));
 
         int designationId;
         Designation designation;
         while (true) {
             designationId = consoleService.readInt("Select Designation (Enter number): ");
-            designation = designationRepository.findById(designationId).orElse(null);
+            int finalDesignationId = designationId;
+            designation = designations.stream()
+                    .filter(d -> d.getId() == finalDesignationId)
+                    .findFirst()
+                    .orElse(null);
             if (designation != null) {
                 break;
             }
@@ -135,9 +136,12 @@ public class ConsoleView {
 
     private void payrollByDepartment() {
         System.out.println("Departments are:");
-        departmentRepository.findAll().forEach(d -> System.out.println(d.getId() + ". " + d.getName()));
+        List<Department> departments = employeeService.getAllDepartments();
+        departments.forEach(d -> System.out.println(d.getId() + ". " + d.getName()));
         int departmentId = consoleService.readInt("Select Department (Enter number): ");
-        Department department = departmentRepository.findById(departmentId)
+        Department department = departments.stream()
+                .filter(d -> d.getId() == departmentId)
+                .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Department ID"));
 
         System.out.println(employeeService.payrollByDepartment(department));
@@ -147,5 +151,4 @@ public class ConsoleView {
         int idForPayroll = consoleService.readInt("Enter Employee ID for payroll details: ");
         System.out.println(employeeService.payrollByID(idForPayroll));
     }
-
 }
