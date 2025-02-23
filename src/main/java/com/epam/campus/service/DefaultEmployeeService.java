@@ -1,5 +1,11 @@
 package com.epam.campus.service;
 
+import com.epam.campus.dto.DepartmentDTO;
+import com.epam.campus.dto.DesignationDTO;
+import com.epam.campus.dto.EmployeeDTO;
+import com.epam.campus.mapper.DepartmentMapper;
+import com.epam.campus.mapper.DesignationMapper;
+import com.epam.campus.mapper.EmployeeMapper;
 import com.epam.campus.model.Department;
 import com.epam.campus.model.Designation;
 import com.epam.campus.model.Employee;
@@ -9,90 +15,97 @@ import com.epam.campus.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DefaultEmployeeService implements EmployeeService {
 
+    @Autowired
     private EmployeeRepository employeeRepository;
-    private SalaryCalculator salaryCalculator;
-    private DepartmentRepository departmentRepository;
-    private DesignationRepository designationRepository;
 
     @Autowired
-    public DefaultEmployeeService(EmployeeRepository employeeRepository, SalaryCalculator salaryCalculator, DesignationRepository designationRepository, DepartmentRepository departmentRepository) {
-        this.employeeRepository = employeeRepository;
-        this.salaryCalculator = salaryCalculator;
-        this.departmentRepository = departmentRepository;
-        this.designationRepository = designationRepository;
+    private DepartmentRepository departmentRepository;
+
+    @Autowired
+    private DesignationRepository designationRepository;
+
+    @Override
+    public EmployeeDTO addEmployee(EmployeeDTO employeeDTO) {
+        Employee employee = EmployeeMapper.toEntity(employeeDTO);
+        Department department = departmentRepository.findById(employeeDTO.getDepartmentId())
+                .orElseThrow(() -> new IllegalArgumentException("Department not found"));
+        Designation designation = designationRepository.findById(employeeDTO.getDesignationId())
+                .orElseThrow(() -> new IllegalArgumentException("Designation not found"));
+
+        employee.setDepartment(department);
+        employee.setDesignation(designation);
+        Employee savedEmployee = employeeRepository.save(employee);
+        return EmployeeMapper.toDTO(savedEmployee);
     }
 
     @Override
-    public String addEmployee(Employee employee) {
-        employeeRepository.save(employee);
-        return "Employee Added";
+    public List<EmployeeDTO> getAllEmployees() {
+        return employeeRepository.findAll().stream()
+                .map(EmployeeMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Employee> readEmployees() {
-        return employeeRepository.findAll();
+    public EmployeeDTO getEmployeeById(int id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+        return EmployeeMapper.toDTO(employee);
     }
 
     @Override
-    public String updateEmployee(int id, int fieldToUpdate, String newValue) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Employee not found"));
-        switch (fieldToUpdate) {
-            case 1 -> employee.setName(newValue);
-            case 2 -> employee.setAge(Integer.parseInt(newValue));
-            case 3 -> employee.setDateOfJoining(LocalDate.parse(newValue));
-            case 4 -> employee.setGender(newValue);
-            case 5 -> employee.setDepartment(new Department(newValue));
-            case 6 -> employee.setDesignation(new Designation(newValue, 0, 0));
-            default -> throw new IllegalArgumentException("Invalid field to update");
-        }
-        employeeRepository.save(employee);
-        return "Employee Updated";
+    public EmployeeDTO updateEmployee(int id, EmployeeDTO employeeDTO) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+        Department department = departmentRepository.findById(employeeDTO.getDepartmentId())
+                .orElseThrow(() -> new IllegalArgumentException("Department not found"));
+        Designation designation = designationRepository.findById(employeeDTO.getDesignationId())
+                .orElseThrow(() -> new IllegalArgumentException("Designation not found"));
+
+        employee.setName(employeeDTO.getName());
+        employee.setAge(employeeDTO.getAge());
+        employee.setDateOfJoining(employeeDTO.getDateOfJoining());
+        employee.setGender(employeeDTO.getGender());
+        employee.setDepartment(department);
+        employee.setDesignation(designation);
+
+        Employee updatedEmployee = employeeRepository.save(employee);
+        return EmployeeMapper.toDTO(updatedEmployee);
     }
 
     @Override
-    public String deleteEmployee(int id) {
+    public void deleteEmployee(int id) {
         employeeRepository.deleteById(id);
-        return "Employee Deleted";
     }
 
     @Override
-    public String payrollByDepartment(Department department) {
-        List<Employee> employees = employeeRepository.findByDepartment(department);
-        StringBuilder result = new StringBuilder();
-        employees.stream()
-                .filter(employee -> department.equals(employee.getDepartment()))
-                .forEach(employee -> {
-                    double grossSalary = salaryCalculator.calculateSalary(employee);
-                    result.append(employee)
-                            .append(", Gross salary: ")
-                            .append(grossSalary)
-                            .append("\n");
-                });
-
-        return result.toString();
+    public List<DepartmentDTO> getAllDepartments() {
+        return departmentRepository.findAll().stream()
+                .map(DepartmentMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public String payrollByID(int id) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Employee not found"));
-        double grossSalary = salaryCalculator.calculateSalary(employee);
-        return (employee.toString() + " Gross salary : " + grossSalary);
+    public void addDepartment(DepartmentDTO departmentDTO) {
+        Department department = DepartmentMapper.toEntity(departmentDTO);
+        departmentRepository.save(department);
     }
 
     @Override
-    public List<Department> getAllDepartments() {
-        return departmentRepository.findAll();
+    public List<DesignationDTO> getAllDesignations() {
+        return designationRepository.findAll().stream()
+                .map(DesignationMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Designation> getAllDesignations() {
-        return designationRepository.findAll();
+    public void addDesignation(DesignationDTO designationDTO) {
+        Designation designation = DesignationMapper.toEntity(designationDTO);
+        designationRepository.save(designation);
     }
-
 }
