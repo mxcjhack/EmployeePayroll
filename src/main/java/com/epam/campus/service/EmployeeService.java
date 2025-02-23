@@ -1,17 +1,19 @@
 package com.epam.campus.service;
 
-import com.epam.campus.model.Department;
-import com.epam.campus.model.Designation;
-import com.epam.campus.model.Employee;
+import com.epam.campus.dto.DepartmentDTO;
+import com.epam.campus.dto.DesignationDTO;
+import com.epam.campus.dto.EmployeeDTO;
+
 import java.util.List;
 
 public interface EmployeeService {
-    String addEmployee(Employee employee);
-    List<Employee> readEmployees();
-    String updateEmployee(int id, int fieldToUpdate, String newValue);
-    String deleteEmployee(int id);
-    String payrollByDepartment(Department department);
-    String payrollByID(int id);
-    List<Department> getAllDepartments();
-    List<Designation> getAllDesignations();
+    EmployeeDTO addEmployee(EmployeeDTO employeeDTO);
+    List<EmployeeDTO> getAllEmployees();
+    EmployeeDTO getEmployeeById(int id);
+    EmployeeDTO updateEmployee(int id, EmployeeDTO employeeDTO);
+    void deleteEmployee(int id);
+    List<DepartmentDTO> getAllDepartments();
+    void addDepartment(DepartmentDTO departmentDTO);
+    List<DesignationDTO> getAllDesignations();
+    void addDesignation(DesignationDTO designationDTO);
 }
