@@ -3,9 +3,11 @@ package com.epam.campus.service;
 import com.epam.campus.dto.DepartmentDTO;
 import com.epam.campus.dto.DesignationDTO;
 import com.epam.campus.dto.EmployeeDTO;
+import com.epam.campus.dto.SalaryDTO;
 import com.epam.campus.mapper.DepartmentMapper;
 import com.epam.campus.mapper.DesignationMapper;
 import com.epam.campus.mapper.EmployeeMapper;
+import com.epam.campus.mapper.SalaryMapper;
 import com.epam.campus.model.Department;
 import com.epam.campus.model.Designation;
 import com.epam.campus.model.Employee;
@@ -15,6 +17,7 @@ import com.epam.campus.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +32,9 @@ public class DefaultEmployeeService implements EmployeeService {
 
     @Autowired
     private DesignationRepository designationRepository;
+
+    @Autowired
+    private DefaultSalaryCalculator salaryCalculator;
 
     @Override
     public EmployeeDTO addEmployee(EmployeeDTO employeeDTO) {
@@ -107,5 +113,32 @@ public class DefaultEmployeeService implements EmployeeService {
     public void addDesignation(DesignationDTO designationDTO) {
         Designation designation = DesignationMapper.toEntity(designationDTO);
         designationRepository.save(designation);
+    }
+
+    @Override
+    public List<SalaryDTO> getPayrollByDepartment(int departmentId) {
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Department Not found"));
+
+        List<SalaryDTO> salaryDTOS = new ArrayList<>();
+
+        List<Employee> employees = department.getEmployees();
+        for(Employee employee : employees){
+            double grossSalary = salaryCalculator.calculateSalary(employee);
+            salaryDTOS.add(SalaryMapper.toDTO(employee, grossSalary));
+        }
+
+        return salaryDTOS;
+
+    }
+
+    @Override
+    public SalaryDTO getPayrollById(int id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+
+        double grossSalary = salaryCalculator.calculateSalary(employee);
+        return SalaryMapper.toDTO(employee, grossSalary);
+
     }
 }

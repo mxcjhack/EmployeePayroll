@@ -12,7 +12,9 @@ public class EmployeeMapper {
         dto.setAge(employee.getAge());
         dto.setDateOfJoining(employee.getDateOfJoining());
         dto.setGender(employee.getGender());
+        dto.setDepartmentName(employee.getDepartment().getName());
         dto.setDepartmentId(employee.getDepartment().getId());
+        dto.setDesignationName(employee.getDesignation().getName());
         dto.setDesignationId(employee.getDesignation().getId());
         return dto;
     }

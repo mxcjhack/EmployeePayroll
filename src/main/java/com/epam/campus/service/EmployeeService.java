@@ -3,6 +3,7 @@ package com.epam.campus.service;
 import com.epam.campus.dto.DepartmentDTO;
 import com.epam.campus.dto.DesignationDTO;
 import com.epam.campus.dto.EmployeeDTO;
+import com.epam.campus.dto.SalaryDTO;
 
 import java.util.List;
 
@@ -16,4 +17,8 @@ public interface EmployeeService {
     void addDepartment(DepartmentDTO departmentDTO);
     List<DesignationDTO> getAllDesignations();
     void addDesignation(DesignationDTO designationDTO);
+
+    List<SalaryDTO> getPayrollByDepartment(int departmentId);
+
+    SalaryDTO getPayrollById(int id);
 }
