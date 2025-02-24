@@ -1,5 +1,6 @@
 package com.epam.campus.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.Objects;
 
@@ -10,7 +11,11 @@ public class Designation {
     private int id;
 
     private String name;
+
+    @JsonIgnore
     private double baseSalary;
+
+    @JsonIgnore
     private double bonusPercentage;
 
     // Default constructor (required by JPA)

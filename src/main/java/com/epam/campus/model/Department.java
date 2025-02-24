@@ -1,5 +1,6 @@
 package com.epam.campus.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 import java.util.Objects;
@@ -12,6 +13,7 @@ public class Department {
 
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "department")
     private List<Employee> employees;
 

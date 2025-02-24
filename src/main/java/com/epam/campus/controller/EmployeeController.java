@@ -1,6 +1,7 @@
 package com.epam.campus.controller;
 
 import com.epam.campus.dto.EmployeeDTO;
+import com.epam.campus.model.Employee;
 import com.epam.campus.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @GetMapping
-    public List<EmployeeDTO> getAllEmployees() {
+    public List<Employee> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 
