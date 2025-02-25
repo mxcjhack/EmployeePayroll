@@ -1,6 +1,7 @@
 package com.epam.campus.controller;
 
 import com.epam.campus.dto.EmployeeDTO;
+import com.epam.campus.model.Department;
 import com.epam.campus.model.Employee;
 import com.epam.campus.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -43,5 +45,15 @@ public class EmployeeController {
     public ResponseEntity<Void> deleteEmployee(@PathVariable int id) {
         employeeService.deleteEmployee(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/department")
+    public Map<Department, List<Employee>> getEmployeesGroupedByDepartment(){
+        return employeeService.getEmployeesGroupedByDepartment();
+    }
+
+    @GetMapping("/joining/{months}")
+    public List<EmployeeDTO> findEmployeesHiredInLastNMonths(@PathVariable int months){
+        return employeeService.findEmployeesHiredInLastNMonths(months);
     }
 }

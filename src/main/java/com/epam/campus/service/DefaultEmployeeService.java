@@ -17,8 +17,9 @@ import com.epam.campus.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -138,5 +139,60 @@ public class DefaultEmployeeService implements EmployeeService {
         double grossSalary = salaryCalculator.calculateSalary(employee);
         return SalaryMapper.toDTO(employee, grossSalary);
 
+    }
+
+    @Override
+    public double getAveragePayrollByDepartment(int departmentId) {
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Department Not found"));
+
+        return department.getEmployees().stream()
+                .mapToDouble(employee -> salaryCalculator.calculateSalary(employee))
+                .average()
+                .orElse(0.0);
+
+    }
+
+    @Override
+    public Map<Department, List<Employee>> getEmployeesGroupedByDepartment() {
+        List<Employee> employees= getAllEmployees();
+        return employees.stream()
+                .collect(Collectors.groupingBy(Employee::getDepartment));
+    }
+
+    @Override
+    public List<Employee> getTopNHighestPaidEmployees(int n) {
+        List<Employee> employees = getAllEmployees();
+        return employees.stream()
+                .sorted((e1, e2) -> (int) (e2.getDesignation().getBaseSalary() - e1.getDesignation().getBaseSalary()))
+                .limit(n)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SalaryDTO> calculatePayrollByJobTitle(String jobTitle) {
+        List<Employee> employees = getAllEmployees();
+        List<SalaryDTO> salaryDTOS = new ArrayList<>();
+        List<Employee> designationEmployees = employees.stream()
+                .filter(employee -> jobTitle.equalsIgnoreCase(employee.getDesignation().getName()))
+                .toList();
+
+        for (Employee employee : designationEmployees){
+            double grossSalary = salaryCalculator.calculateSalary(employee);
+            salaryDTOS.add(SalaryMapper.toDTO(employee, grossSalary));
+        }
+
+        return salaryDTOS;
+    }
+
+    @Override
+    public List<EmployeeDTO> findEmployeesHiredInLastNMonths(int months) {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate cutOffDate = currentDate.minusMonths(months);
+
+        return getAllEmployees().stream()
+                .filter(employee -> employee.getDateOfJoining().isAfter(cutOffDate))
+                .map(EmployeeMapper::toDTO)
+                .toList();
     }
 }
