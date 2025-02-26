@@ -1,6 +1,7 @@
 package com.epam.campus.controller;
 
 import com.epam.campus.dto.DepartmentDTO;
+import com.epam.campus.service.DepartmentService;
 import com.epam.campus.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +16,22 @@ import java.util.List;
 public class DepartmentController {
 
     @Autowired
-    private EmployeeService employeeService;
+    private DepartmentService departmentService;
 
     @GetMapping
     public List<DepartmentDTO> getAllDepartments() {
-        return employeeService.getAllDepartments();
+        return departmentService.getAllDepartments();
     }
 
     @PostMapping
     public ResponseEntity<String> addDepartment(@RequestBody @Valid DepartmentDTO departmentDTO) {
-        employeeService.addDepartment(departmentDTO);
+        departmentService.addDepartment(departmentDTO);
         return ResponseEntity.ok("Department added successfully");
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteDepartment(@PathVariable int id){
+        departmentService.deleteDepartment(id);
+        return ResponseEntity.ok("Department Deleted");
     }
 }

@@ -1,6 +1,8 @@
 package com.epam.campus.controller;
 
 import com.epam.campus.dto.DesignationDTO;
+import com.epam.campus.model.Designation;
+import com.epam.campus.service.DesignationService;
 import com.epam.campus.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,21 +16,21 @@ import java.util.List;
 public class DesignationController {
 
     @Autowired
-    private EmployeeService employeeService;
+    private DesignationService designationService;
 
     @GetMapping
     public List<DesignationDTO> getAllDesignations() {
-        return employeeService.getAllDesignations();
+        return designationService.getAllDesignations();
     }
 
     @PostMapping
     public ResponseEntity<String> addDesignation(@RequestBody @Valid DesignationDTO designationDTO) {
-        employeeService.addDesignation(designationDTO);
+        designationService.addDesignation(designationDTO);
         return ResponseEntity.ok("Designation added successfully");
     }
 
     @DeleteMapping("/{id}")
     public void deleteDesignation(@PathVariable int id){
-        employeeService.deleteDesignation(id);
+        designationService.deleteDesignation(id);
     }
 }

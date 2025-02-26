@@ -88,102 +88,6 @@ public class DefaultEmployeeService implements EmployeeService {
         employeeRepository.deleteById(id);
     }
 
-    @Override
-    public List<DepartmentDTO> getAllDepartments() {
-        return departmentRepository.findAll().stream()
-                .map(DepartmentMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void addDepartment(DepartmentDTO departmentDTO) {
-        Department department = DepartmentMapper.toEntity(departmentDTO);
-        departmentRepository.save(department);
-    }
-
-    @Override
-    public List<DesignationDTO> getAllDesignations() {
-        return designationRepository.findAll().stream()
-                .map(DesignationMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void addDesignation(DesignationDTO designationDTO) {
-        Designation designation = DesignationMapper.toEntity(designationDTO);
-        designationRepository.save(designation);
-    }
-
-    @Override
-    public List<SalaryDTO> getPayrollByDepartment(int departmentId) {
-        Department department = departmentRepository.findById(departmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Department Not found"));
-
-        List<SalaryDTO> salaryDTOS = new ArrayList<>();
-
-        List<Employee> employees = department.getEmployees();
-        for(Employee employee : employees){
-            double grossSalary = salaryCalculator.calculateSalary(employee);
-            salaryDTOS.add(SalaryMapper.toDTO(employee, grossSalary));
-        }
-
-        return salaryDTOS;
-
-    }
-
-    @Override
-    public SalaryDTO getPayrollById(int id) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
-
-        double grossSalary = salaryCalculator.calculateSalary(employee);
-        return SalaryMapper.toDTO(employee, grossSalary);
-
-    }
-
-    @Override
-    public double getAveragePayrollByDepartment(int departmentId) {
-        Department department = departmentRepository.findById(departmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Department Not found"));
-
-        return department.getEmployees().stream()
-                .mapToDouble(employee -> salaryCalculator.calculateSalary(employee))
-                .average()
-                .orElse(0.0);
-
-    }
-
-    @Override
-    public Map<Department, List<Employee>> getEmployeesGroupedByDepartment() {
-        List<Employee> employees= getAllEmployees();
-        return employees.stream()
-                .collect(Collectors.groupingBy(Employee::getDepartment));
-    }
-
-    @Override
-    public List<Employee> getTopNHighestPaidEmployees(int n) {
-        List<Employee> employees = getAllEmployees();
-        return employees.stream()
-                .sorted((e1, e2) -> (int) (e2.getDesignation().getBaseSalary() - e1.getDesignation().getBaseSalary()))
-                .limit(n)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<SalaryDTO> calculatePayrollByJobTitle(String jobTitle) {
-        List<Employee> employees = getAllEmployees();
-        List<SalaryDTO> salaryDTOS = new ArrayList<>();
-        List<Employee> designationEmployees = employees.stream()
-                .filter(employee -> jobTitle.equalsIgnoreCase(employee.getDesignation().getName()))
-                .toList();
-
-        for (Employee employee : designationEmployees){
-            double grossSalary = salaryCalculator.calculateSalary(employee);
-            salaryDTOS.add(SalaryMapper.toDTO(employee, grossSalary));
-        }
-
-        return salaryDTOS;
-    }
 
     @Override
     public List<EmployeeDTO> findEmployeesHiredInLastNMonths(int months) {
@@ -194,10 +98,5 @@ public class DefaultEmployeeService implements EmployeeService {
                 .filter(employee -> employee.getDateOfJoining().isAfter(cutOffDate))
                 .map(EmployeeMapper::toDTO)
                 .toList();
-    }
-
-    @Override
-    public void deleteDesignation(int id) {
-        designationRepository.deleteById(id);
     }
 }

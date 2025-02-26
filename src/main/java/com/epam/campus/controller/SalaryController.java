@@ -4,6 +4,7 @@ package com.epam.campus.controller;
 import com.epam.campus.dto.SalaryDTO;
 import com.epam.campus.model.Employee;
 import com.epam.campus.service.EmployeeService;
+import com.epam.campus.service.SalaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,31 +18,31 @@ import java.util.List;
 public class SalaryController {
 
     @Autowired
-    EmployeeService employeeService;
+    SalaryService salaryService;
 
     @GetMapping("/department/{departmentId}")
     public List<SalaryDTO> getPayrollByDepartment(@PathVariable int departmentId){
-        return employeeService.getPayrollByDepartment(departmentId);
+        return salaryService.getPayrollByDepartment(departmentId);
     }
 
     @GetMapping("/department/{departmentId}/average")
     public double getAveragePayrollByDepartment(@PathVariable int departmentId){
-        return employeeService.getAveragePayrollByDepartment(departmentId);
+        return salaryService.getAveragePayrollByDepartment(departmentId);
     }
 
     @GetMapping("/designation/{jobTitle}")
     public List<SalaryDTO> calculatePayrollByJobTitle(@PathVariable String jobTitle){
-        return employeeService.calculatePayrollByJobTitle(jobTitle);
+        return salaryService.calculatePayrollByJobTitle(jobTitle);
     }
 
     @GetMapping("/{id}")
     public SalaryDTO getPayrollById(@PathVariable int id){
-        return employeeService.getPayrollById(id);
+        return salaryService.getPayrollById(id);
     }
 
     @GetMapping("top-salaries/{n}")
     public List<Employee> getTopNHighestPaidEmployees (@PathVariable int n){
-        return employeeService.getTopNHighestPaidEmployees(n);
+        return salaryService.getTopNHighestPaidEmployees(n);
     }
 
 }

@@ -48,10 +48,6 @@ public class EmployeeController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/department")
-    public Map<Department, List<Employee>> getEmployeesGroupedByDepartment(){
-        return employeeService.getEmployeesGroupedByDepartment();
-    }
 
     @GetMapping("/joining/{months}")
     public List<EmployeeDTO> findEmployeesHiredInLastNMonths(@PathVariable int months){
