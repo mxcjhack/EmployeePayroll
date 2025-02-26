@@ -4,6 +4,7 @@ import com.epam.campus.dto.EmployeeDTO;
 import com.epam.campus.model.Department;
 import com.epam.campus.model.Employee;
 import com.epam.campus.service.EmployeeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,13 +31,13 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<EmployeeDTO> addEmployee(@RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<EmployeeDTO> addEmployee(@RequestBody @Valid EmployeeDTO employeeDTO) {
         EmployeeDTO savedEmployeeDTO = employeeService.addEmployee(employeeDTO);
         return ResponseEntity.ok(savedEmployeeDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable int id, @RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable int id, @RequestBody @Valid EmployeeDTO employeeDTO) {
         EmployeeDTO updatedEmployeeDTO = employeeService.updateEmployee(id, employeeDTO);
         return ResponseEntity.ok(updatedEmployeeDTO);
     }

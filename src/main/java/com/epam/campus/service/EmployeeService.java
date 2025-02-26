@@ -34,4 +34,6 @@ public interface EmployeeService {
     List<SalaryDTO> calculatePayrollByJobTitle(String jobTitle);
 
     List<EmployeeDTO> findEmployeesHiredInLastNMonths(int months);
+
+    void deleteDesignation(int id);
 }

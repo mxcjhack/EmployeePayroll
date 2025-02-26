@@ -195,4 +195,9 @@ public class DefaultEmployeeService implements EmployeeService {
                 .map(EmployeeMapper::toDTO)
                 .toList();
     }
+
+    @Override
+    public void deleteDesignation(int id) {
+        designationRepository.deleteById(id);
+    }
 }

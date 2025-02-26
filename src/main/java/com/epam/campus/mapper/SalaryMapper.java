@@ -3,7 +3,6 @@ package com.epam.campus.mapper;
 import com.epam.campus.dto.SalaryDTO;
 import com.epam.campus.model.Employee;
 
-import java.util.List;
 
 public class SalaryMapper {
 
