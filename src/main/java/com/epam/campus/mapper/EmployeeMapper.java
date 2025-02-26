@@ -7,7 +7,6 @@ public class EmployeeMapper {
 
     public static EmployeeDTO toDTO(Employee employee) {
         EmployeeDTO dto = new EmployeeDTO();
-        dto.setId(employee.getId());
         dto.setName(employee.getName());
         dto.setAge(employee.getAge());
         dto.setDateOfJoining(employee.getDateOfJoining());
@@ -21,7 +20,6 @@ public class EmployeeMapper {
 
     public static Employee toEntity(EmployeeDTO dto) {
         Employee employee = new Employee();
-        employee.setId(dto.getId());
         employee.setName(dto.getName());
         employee.setAge(dto.getAge());
         employee.setDateOfJoining(dto.getDateOfJoining());

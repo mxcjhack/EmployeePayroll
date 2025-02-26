@@ -7,7 +7,6 @@ public class DesignationMapper {
 
     public static DesignationDTO toDTO(Designation designation) {
         DesignationDTO dto = new DesignationDTO();
-        dto.setId(designation.getId());
         dto.setName(designation.getName());
         dto.setBaseSalary(designation.getBaseSalary());
         dto.setBonusPercentage(designation.getBonusPercentage());
@@ -16,7 +15,6 @@ public class DesignationMapper {
 
     public static Designation toEntity(DesignationDTO dto) {
         Designation designation = new Designation();
-        designation.setId(dto.getId());
         designation.setName(dto.getName());
         designation.setBaseSalary(dto.getBaseSalary());
         designation.setBonusPercentage(dto.getBonusPercentage());
