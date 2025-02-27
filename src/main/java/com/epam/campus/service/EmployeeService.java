@@ -12,26 +12,9 @@ import java.util.Map;
 
 public interface EmployeeService {
     EmployeeDTO addEmployee(EmployeeDTO employeeDTO);
-    List<Employee> getAllEmployees();
+    List<EmployeeDTO> getAllEmployees();
     EmployeeDTO getEmployeeById(int id);
     EmployeeDTO updateEmployee(int id, EmployeeDTO employeeDTO);
     void deleteEmployee(int id);
-    List<DepartmentDTO> getAllDepartments();
-    void addDepartment(DepartmentDTO departmentDTO);
-    List<DesignationDTO> getAllDesignations();
-    void addDesignation(DesignationDTO designationDTO);
-
-    List<SalaryDTO> getPayrollByDepartment(int departmentId);
-
-    SalaryDTO getPayrollById(int id);
-
-    double getAveragePayrollByDepartment(int departmentId);
-
-    Map<Department, List<Employee>> getEmployeesGroupedByDepartment();
-
-    List<Employee> getTopNHighestPaidEmployees(int n);
-
-    List<SalaryDTO> calculatePayrollByJobTitle(String jobTitle);
-
     List<EmployeeDTO> findEmployeesHiredInLastNMonths(int months);
 }

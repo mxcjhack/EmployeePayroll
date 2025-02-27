@@ -1,88 +1,45 @@
 package com.epam.campus.dto;
 
+import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDate;
 
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class EmployeeDTO {
+
     private int id;
+
+    @Size(min = 3, max = 20, message = "Name should be between 3 and 20")
+    @NotBlank(message = "Name should not be blank")
+    @NotNull
     private String name;
+
+    @Min(value = 21, message = "Employees should be more than 20")
     private int age;
+
+    @PastOrPresent
     private LocalDate dateOfJoining;
+
+    @NotNull
     private String gender;
     private String departmentName;
+
+    @Min(value = 1)
     private int departmentId;
     private String designationName;
+
+    @Min(value = 1)
     private int designationId;
 
-    // Getters and Setters
-    public int getId() {
-        return id;
+    public void validate() {
+        if (this.id != 0) {
+            throw new IllegalArgumentException("ID should not be provided for creating or updating an Employee.");
+        }
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public LocalDate getDateOfJoining() {
-        return dateOfJoining;
-    }
-
-    public void setDateOfJoining(LocalDate dateOfJoining) {
-        this.dateOfJoining = dateOfJoining;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getDepartmentName() {
-        return departmentName;
-    }
-
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
-    }
-
-    public String getDesignationName() {
-        return designationName;
-    }
-
-    public void setDesignationName(String designationName) {
-        this.designationName = designationName;
-    }
-
-    public int getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(int departmentId) {
-        this.departmentId = departmentId;
-    }
-
-    public int getDesignationId() {
-        return designationId;
-    }
-
-    public void setDesignationId(int designationId) {
-        this.designationId = designationId;
-    }
 }
