@@ -12,7 +12,7 @@ import java.util.Map;
 
 public interface EmployeeService {
     EmployeeDTO addEmployee(EmployeeDTO employeeDTO);
-    List<Employee> getAllEmployees();
+    List<EmployeeDTO> getAllEmployees();
     EmployeeDTO getEmployeeById(int id);
     EmployeeDTO updateEmployee(int id, EmployeeDTO employeeDTO);
     void deleteEmployee(int id);

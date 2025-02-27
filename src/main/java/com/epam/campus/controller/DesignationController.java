@@ -29,6 +29,12 @@ public class DesignationController {
         return ResponseEntity.ok("Designation added successfully");
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateDesignation(@PathVariable int id, @RequestBody @Valid DesignationDTO designationDTO){
+        designationService.updateDesignation(id, designationDTO);
+        return ResponseEntity.ok("Designation updated Successfully");
+    }
+
     @DeleteMapping("/{id}")
     public void deleteDesignation(@PathVariable int id){
         designationService.deleteDesignation(id);

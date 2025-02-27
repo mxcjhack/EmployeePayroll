@@ -17,4 +17,6 @@ public interface DesignationService {
     public List<DesignationDTO> getAllDesignations();
     public void addDesignation(@Valid DesignationDTO designationDTO);
     public void deleteDesignation(int id);
+
+    void updateDesignation(int id, @Valid DesignationDTO designationDTO);
 }

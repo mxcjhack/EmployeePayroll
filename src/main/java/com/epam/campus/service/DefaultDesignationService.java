@@ -1,6 +1,8 @@
 package com.epam.campus.service;
 
 import com.epam.campus.dto.DesignationDTO;
+import com.epam.campus.exception.DepartmentNotFoundException;
+import com.epam.campus.exception.DesignationNotFoundException;
 import com.epam.campus.mapper.DesignationMapper;
 import com.epam.campus.model.Designation;
 import com.epam.campus.repository.DesignationRepository;
@@ -28,6 +30,7 @@ public class DefaultDesignationService implements DesignationService{
 
     @Override
     public void addDesignation(DesignationDTO designationDTO) {
+        designationDTO.validate();
         Designation designation = DesignationMapper.toEntity(designationDTO);
         designationRepository.save(designation);
     }
@@ -35,5 +38,18 @@ public class DefaultDesignationService implements DesignationService{
     @Override
     public void deleteDesignation(int id) {
         designationRepository.deleteById(id);
+    }
+
+    @Override
+    public void updateDesignation(int id, DesignationDTO designationDTO) {
+        designationDTO.validate();
+        Designation designation = designationRepository.findById(id)
+                .orElseThrow(() -> new DepartmentNotFoundException("Designation Does not exist"));
+
+        designation.setName(designationDTO.getName());
+        designation.setBaseSalary(designationDTO.getBaseSalary());
+        designation.setBonusPercentage(designationDTO.getBonusPercentage());
+
+        designationRepository.save(designation);
     }
 }

@@ -4,6 +4,9 @@ import com.epam.campus.dto.DepartmentDTO;
 import com.epam.campus.dto.DesignationDTO;
 import com.epam.campus.dto.EmployeeDTO;
 import com.epam.campus.dto.SalaryDTO;
+import com.epam.campus.exception.DepartmentNotFoundException;
+import com.epam.campus.exception.DesignationNotFoundException;
+import com.epam.campus.exception.EmployeeNotFoundException;
 import com.epam.campus.mapper.DepartmentMapper;
 import com.epam.campus.mapper.DesignationMapper;
 import com.epam.campus.mapper.EmployeeMapper;
@@ -14,6 +17,7 @@ import com.epam.campus.model.Employee;
 import com.epam.campus.repository.DepartmentRepository;
 import com.epam.campus.repository.DesignationRepository;
 import com.epam.campus.repository.EmployeeRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,27 +27,21 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class DefaultEmployeeService implements EmployeeService {
 
-    @Autowired
     private EmployeeRepository employeeRepository;
-
-    @Autowired
     private DepartmentRepository departmentRepository;
-
-    @Autowired
     private DesignationRepository designationRepository;
-
-    @Autowired
-    private DefaultSalaryCalculator salaryCalculator;
 
     @Override
     public EmployeeDTO addEmployee(EmployeeDTO employeeDTO) {
+        employeeDTO.validate();
         Employee employee = EmployeeMapper.toEntity(employeeDTO);
         Department department = departmentRepository.findById(employeeDTO.getDepartmentId())
-                .orElseThrow(() -> new IllegalArgumentException("Department not found"));
+                .orElseThrow(() -> new DepartmentNotFoundException("Department not found"));
         Designation designation = designationRepository.findById(employeeDTO.getDesignationId())
-                .orElseThrow(() -> new IllegalArgumentException("Designation not found"));
+                .orElseThrow(() -> new DesignationNotFoundException("Designation not found"));
 
         employee.setDepartment(department);
         employee.setDesignation(designation);
@@ -52,25 +50,28 @@ public class DefaultEmployeeService implements EmployeeService {
     }
 
     @Override
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+    public List<EmployeeDTO> getAllEmployees() {
+        return employeeRepository.findAll().stream()
+                .map(EmployeeMapper::toDTO)
+                .toList();
     }
 
     @Override
     public EmployeeDTO getEmployeeById(int id) {
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
         return EmployeeMapper.toDTO(employee);
     }
 
     @Override
     public EmployeeDTO updateEmployee(int id, EmployeeDTO employeeDTO) {
+        employeeDTO.validate();
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
         Department department = departmentRepository.findById(employeeDTO.getDepartmentId())
-                .orElseThrow(() -> new IllegalArgumentException("Department not found"));
+                .orElseThrow(() -> new DepartmentNotFoundException("Department not found"));
         Designation designation = designationRepository.findById(employeeDTO.getDesignationId())
-                .orElseThrow(() -> new IllegalArgumentException("Designation not found"));
+                .orElseThrow(() -> new DesignationNotFoundException("Designation not found"));
 
         employee.setName(employeeDTO.getName());
         employee.setAge(employeeDTO.getAge());
@@ -96,7 +97,6 @@ public class DefaultEmployeeService implements EmployeeService {
 
         return getAllEmployees().stream()
                 .filter(employee -> employee.getDateOfJoining().isAfter(cutOffDate))
-                .map(EmployeeMapper::toDTO)
                 .toList();
     }
 }

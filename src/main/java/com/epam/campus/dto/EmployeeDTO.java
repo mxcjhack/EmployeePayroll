@@ -11,6 +11,9 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 public class EmployeeDTO {
+
+    private int id;
+
     @Size(min = 3, max = 20, message = "Name should be between 3 and 20")
     @NotBlank(message = "Name should not be blank")
     @NotNull
@@ -32,5 +35,11 @@ public class EmployeeDTO {
 
     @Min(value = 1)
     private int designationId;
+
+    public void validate() {
+        if (this.id != 0) {
+            throw new IllegalArgumentException("ID should not be provided for creating or updating an Employee.");
+        }
+    }
 
 }

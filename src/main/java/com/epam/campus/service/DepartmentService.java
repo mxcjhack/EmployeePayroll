@@ -13,4 +13,6 @@ public interface DepartmentService {
     void addDepartment(@Valid DepartmentDTO departmentDTO);
 
     void deleteDepartment(int id);
+
+    void updateDepartment(int id, DepartmentDTO departmentDTO);
 }

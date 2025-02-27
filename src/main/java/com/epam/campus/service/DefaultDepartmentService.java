@@ -1,6 +1,7 @@
 package com.epam.campus.service;
 
 import com.epam.campus.dto.DepartmentDTO;
+import com.epam.campus.exception.DepartmentNotFoundException;
 import com.epam.campus.mapper.DepartmentMapper;
 import com.epam.campus.model.Department;
 import com.epam.campus.repository.DepartmentRepository;
@@ -28,6 +29,7 @@ public class DefaultDepartmentService implements DepartmentService{
 
     @Override
     public void addDepartment(DepartmentDTO departmentDTO) {
+        departmentDTO.validate();
         Department department = DepartmentMapper.toEntity(departmentDTO);
         departmentRepository.save(department);
     }
@@ -35,5 +37,15 @@ public class DefaultDepartmentService implements DepartmentService{
     @Override
     public void deleteDepartment(int id) {
         departmentRepository.deleteById(id);
+    }
+
+    @Override
+    public void updateDepartment(int id, DepartmentDTO departmentDTO) {
+        departmentDTO.validate();
+        Department department = departmentRepository.findById(id)
+                .orElseThrow(() -> new DepartmentNotFoundException("Department Does not exist"));
+
+        department.setName(departmentDTO.getName());
+        departmentRepository.save(department);
     }
 }

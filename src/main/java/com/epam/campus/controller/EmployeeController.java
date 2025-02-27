@@ -20,7 +20,7 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @GetMapping
-    public List<Employee> getAllEmployees() {
+    public List<EmployeeDTO> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 
